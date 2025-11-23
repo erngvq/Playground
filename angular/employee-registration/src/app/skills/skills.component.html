@@ -1,0 +1,36 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-info btn-sm" (click)="addSkill()">Add Skill</button>
+        </div>
+    </div>
+    <table class="table table-bordered mt-3">
+        <thead>
+        <tr>
+            <th>Skill Name</th>
+            <th>Total Experience</th>
+            <th>Last Version Used</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let skill of employee.erpEmployeeSkills; let i = index">
+            <td>
+                <input type="text" [(ngModel)]="skill.skill" placeholder="Skill Name" class="form-control" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="skill.totalYearExp" placeholder="Total Experience" class="form-control" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="skill.lastVersionUsed" placeholder="Last Version Used" class="form-control" />
+            </td>
+            <td>
+                <button class="btn btn-danger btn-sm" (click)="removeSkill(i)">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="text-end">
+        <button class="btn btn-primary" (click)="next.emit()">Next</button>
+    </div>
+</div>

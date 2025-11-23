@@ -1,0 +1,17 @@
+### Sample http test
+
+POST {{host}}/hello
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+    "name": "Ernie",
+    "age": "26"
+}
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "response status mismatch");
+        client.assert(response.body['name'] === "Ernie", "name mismatch");
+        client.assert(response.body['age'] === 26, "age mismatch");
+    });
+%}

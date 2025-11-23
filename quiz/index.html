@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Quiz Time</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .choice {
+            margin: 5px 0;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+
+        .choice.correct {
+            background-color: #c8e6c9;
+        }
+
+        .choice.incorrect {
+            background-color: #ffcdd2;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+        #exampleJSON {
+            display: none;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Quiz Time</h1>
+    <button id="showExampleBtn">Show Example JSON</button>
+    <input type="file" id="loader" accept=".json" />
+    <div id="exampleJSON"></div>
+    <div id="quiz"></div>
+
+    <script>
+        const exampleJSON = [
+            {
+                "id": 1,
+                "questionText": "Which planet in our solar system is known as the \"Red Planet\"?",
+                "options": [
+                    "Venus",
+                    "Jupiter",
+                    "Mars",
+                    "Saturn"
+                ],
+                "correctAnswer": ["Mars"],
+                "answerType": "radio"
+            },
+            {
+                "id": 2,
+                "questionText": "Which of the following animals are classified as mammals?",
+                "options": [
+                    "Platypus",
+                    "Penguin",
+                    "Shark",
+                    "Dolphin",
+                    "Bat"
+                ],
+                "correctAnswer": [
+                    "Platypus",
+                    "Dolphin",
+                    "Bat"
+                ],
+                "answerType": "checkbox"
+            }
+        ];
+
+        // Show example JSON
+        document.getElementById('showExampleBtn').addEventListener('click', () => {
+            const div = document.getElementById('exampleJSON');
+            div.innerHTML = `<h3>Example questions.json format:</h3><pre>${JSON.stringify(exampleJSON, null, 2)}</pre>`;
+            div.style.display = 'block';
+        });
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        let questions = [];
+        let currentIndex = 0;
+
+        document.getElementById('loader').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            document.getElementById('exampleJSON').style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = function () {
+                try {
+                    questions = JSON.parse(reader.result);
+                    shuffle(questions);
+                    currentIndex = 0;
+                    renderQuestion();
+                } catch (err) {
+                    alert('Failed to parse JSON: ' + err);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function renderQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            quizDiv.innerHTML = '';
+            if (currentIndex >= questions.length) {
+                quizDiv.innerHTML = '<h2>Quiz finished!</h2>';
+                return;
+            }
+
+            const q = questions[currentIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question';
+
+            const shuffledOptions = [...q.options];
+            shuffle(shuffledOptions);
+
+            qDiv.innerHTML = `
+                <strong>Question ${currentIndex + 1} of ${questions.length}:</strong><br>
+                ${q.questionText}
+                <div id="options">
+                ${shuffledOptions.map(opt => `
+                    <div class="choice">
+                    <label>
+                        <input type="${q.answerType === 'checkbox' ? 'checkbox' : 'radio'}" name="answer" value="${opt}"> ${opt}
+                    </label>
+                    </div>`).join('')}
+                </div>
+                <div id="feedback"></div>
+                <button id="checkBtn">Check Answer</button>
+                <button id="nextBtn" style="display:none">Next Question</button>
+            `;
+
+            quizDiv.appendChild(qDiv);
+
+            document.getElementById('checkBtn').onclick = () => checkAnswer(q, shuffledOptions);
+            document.getElementById('nextBtn').onclick = () => {
+                currentIndex++;
+                renderQuestion();
+            };
+        }
+
+        // Check the answer for the current question
+        function checkAnswer(q, shuffledOptions) {
+            const selectedInputs = [...document.querySelectorAll('input[name="answer"]:checked')];
+            const selected = selectedInputs.map(i => i.value);
+            const correct = q.correctAnswer;
+
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+            const choiceDivs = document.querySelectorAll('.choice');
+
+            choiceDivs.forEach(div => div.classList.remove('correct', 'incorrect'));
+
+            // Apply coloring
+            choiceDivs.forEach(div => {
+                const input = div.querySelector('input');
+                if (!input) return;
+                if (correct.includes(input.value)) div.classList.add('correct');
+                else if (input.checked && !correct.includes(input.value)) div.classList.add('incorrect');
+            });
+
+            // Feedback message
+            const correctSet = new Set(correct);
+            const selectedSet = new Set(selected);
+            if (correctSet.size === selectedSet.size && [...correctSet].every(v => selectedSet.has(v))) {
+                feedback.textContent = 'Correct!';
+                feedback.style.color = 'green';
+            } else {
+                feedback.textContent = 'Incorrect!';
+                feedback.style.color = 'red';
+            }
+
+            nextBtn.style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>

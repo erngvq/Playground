@@ -1,0 +1,60 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" [routerLink]="['/home']" routerLinkActive="router-link-active">Logo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mynavbar">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" *ngIf="loggedHospitalData.hospitalId != 0" [routerLink]="['/appointments']"
+                       routerLinkActive="router-link-active">Appointment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" *ngIf="loggedHospitalData.hospitalId != 0" [routerLink]="['/patients']"
+                       routerLinkActive="router-link-active">Patients</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <button class="btn btn-sm btn-light" *ngIf="loggedHospitalData.hospitalId != 0" type="button">
+                    {{ loggedHospitalData.hospitalEmailId }}
+                </button>
+                <button class="btn btn-sm btn-success" *ngIf="loggedHospitalData.hospitalId != 0" type="button" (click)="logout()">
+                    Logout
+                </button>
+                <button class="btn btn-sm btn-primary" *ngIf="loggedHospitalData.hospitalId == 0" type="button" (click)="showLogin()">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<router-outlet></router-outlet>
+
+<div class="modal" id="loginModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Login</h4>
+                <button type="button" class="btn-close" (click)="closeLogin()" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="usernameId">Username</label>
+                        <input type="text" [(ngModel)]="user.username" class="form-control" id="usernameId">
+                    </div>
+                    <div class="col-12">
+                        <label for="passwordId">Password</label>
+                        <input type="text" [(ngModel)]="user.password" class="form-control" id="passwordId">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" (click)="closeLogin()" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" (click)="onLogin()" data-bs-dismiss="modal">Login</button>
+            </div>
+        </div>
+    </div>
+</div>

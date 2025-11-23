@@ -1,0 +1,49 @@
+<div class="col-12">
+    <div class="row mb-3">
+        <div class="col-12 text-end">
+            <button class="btn btn-success" (click)="goToList()">Employee List</button>
+        </div>
+    </div>
+    <div class="progress-wrapper">
+        <div id="progress-bar-container">
+            <ul>
+                <li
+                    class="step step01"
+                    (click)="setActiveStep(step)"
+                    [ngClass]="step.stepName === activeStep.stepName ? 'active' : ''"
+                    *ngFor="let step of stepsList"
+                >
+                    <div class="step-inner">{{ step.stepName }}</div>
+                </li>
+            </ul>
+            <div id="line">
+                <div id="line-progress" [style.width.%]="stepperCompletionValue"></div>
+            </div>
+        </div>
+        <div id="progress-content-section">
+            <!-- Content for each step -->
+            <div class="section-content step1 active" *ngIf="activeStep.stepName === 'Basic Details'">
+                <app-basic-details
+                    [employee]="employeeObj"
+                    [roleList]="roleList"
+                    [designationList]="designationList"
+                    (next)="goToSkills()"
+                ></app-basic-details>
+            </div>
+
+            <div class="section-content step2 active" *ngIf="activeStep.stepName === 'Skills'">
+                <app-skills
+                    [employee]="employeeObj"
+                    (next)="goToExperience()"
+                ></app-skills>
+            </div>
+
+            <div class="section-content step3 active" *ngIf="activeStep.stepName === 'Experience'">
+                <app-experience
+                    [employee]="employeeObj"
+                    (save)="saveEmployee($event)"
+                ></app-experience>
+            </div>
+        </div>
+    </div>
+</div>

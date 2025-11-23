@@ -1,0 +1,11 @@
+<code_scheme name="DefaultErnie" version="173">
+    <option name="RIGHT_MARGIN" value="140" />
+    <Python>
+        <option name="BLANK_LINES_AROUND_TOP_LEVEL_CLASSES_FUNCTIONS" value="1" />
+    </Python>
+    <codeStyleSettings language="Python">
+        <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        </indentOptions>
+    </codeStyleSettings>
+</code_scheme>

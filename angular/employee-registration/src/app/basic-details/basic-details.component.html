@@ -1,0 +1,75 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    [(ngModel)]="employee.empName"
+                    placeholder="Enter Name"
+                    class="form-control"
+                />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input
+                    type="text"
+                    id="email"
+                    [(ngModel)]="employee.empEmail"
+                    placeholder="Enter Email"
+                    class="form-control"
+                />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="email">Phone Number:</label>
+                <input
+                    type="text"
+                    id="phone"
+                    [(ngModel)]="employee.empPhoneNumber"
+                    placeholder="Enter Phone Number"
+                    class="form-control"
+                />
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="designation">Designation:</label>
+                <select
+                    id="designation"
+                    [(ngModel)]="employee.empDesignation"
+                    class="form-select"
+                >
+                    <option value="">Select Designation</option>
+                    <option *ngFor="let item of designationList" [value]="item.name">
+                        {{ item.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="role">Role:</label>
+                <select
+                    id="role"
+                    [(ngModel)]="employee.empRole"
+                    class="form-select"
+                >
+                    <option value="">Select Role</option>
+                    <option *ngFor="let item of roleList" [value]="item.name">
+                        {{ item.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="text-end mt-4">
+        <button class="btn btn-primary" (click)="next.emit()">Next</button>
+    </div>
+</div>

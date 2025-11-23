@@ -1,0 +1,44 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-info btn-sm" (click)="addExperience()">Add Experience</button>
+        </div>
+    </div>
+    <table class="table table-bordered mt-3">
+        <thead>
+        <tr>
+            <th>Company</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Designation</th>
+            <th>Project</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let exp of employee.ermEmpExperiences; let i = index">
+            <td>
+                <input type="text" [(ngModel)]="exp.companyName" placeholder="Company Name" class="form-control" />
+            </td>
+            <td>
+                <input type="date" [(ngModel)]="exp.startDate" class="form-control" />
+            </td>
+            <td>
+                <input type="date" [(ngModel)]="exp.endDate" class="form-control" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="exp.designation" placeholder="Designation" class="form-control" />
+            </td>
+            <td>
+                <input type="text" [(ngModel)]="exp.projectsWorkedOn" placeholder="Projects" class="form-control" />
+            </td>
+            <td>
+                <button class="btn btn-danger btn-sm" (click)="removeExperience(i)">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="text-end">
+        <button class="btn btn-primary" (click)="save.emit(employee)">Save</button>
+    </div>
+</div>

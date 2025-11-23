@@ -1,0 +1,146 @@
+<div class="row">
+    <div class="col-8">
+        <div class="row">
+            @for (item of appointmentList; track $index) {
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ item.mobileNo }}</h6>
+                            <p class="card-text">{{ item.naration }}</p>
+                            <a href="#" class="card-link">{{ item.appointmentTime }}</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header bg-secondary">
+                New Appointment
+            </div>
+            <div class="card-body">
+                <form class="">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-user fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="text"
+                                           name="name"
+                                           id="nameId"
+                                           placeholder="Enter Name"
+                                           class="form-control" [(ngModel)]="appointment.name" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-phone fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="text"
+                                           name="mobileNo"
+                                           id="mobileNoId"
+                                           placeholder="Enter Mobile Number"
+                                           class="form-control" [(ngModel)]="appointment.mobileNo" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-map-marker fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="text"
+                                           name="city"
+                                           id="cityId"
+                                           placeholder="Enter City"
+                                           class="form-control" [(ngModel)]="appointment.city" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-child fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="text"
+                                           name="age"
+                                           id="ageId"
+                                           placeholder="Enter Age"
+                                           class="form-control" [(ngModel)]="appointment.age" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-plus-circle fa-lg me-1 fa-fw"></i>
+                                <div class="flex-fill mb-0">
+                                    <input type="checkbox" name="isFirstVisit" id="isFirstVisitId" [(ngModel)]="appointment.isFirstVisit" />
+                                    First Visit
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-venus-double fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="radio" name="gender" id="genderId1" value="Male" [(ngModel)]="appointment.gender" /> Male
+                                    <input type="radio" name="gender" id="genderId2" value="Female" [(ngModel)]="appointment.gender" />
+                                                                                                                                      Female
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-calendar fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="date"
+                                           name="appointmentDate"
+                                           id="appointmentDateId"
+                                           class="form-control" [(ngModel)]="appointment.appointmentDate" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-clock-o fa-lg me-1 fa-fw"></i>
+                                <div class="mb-0">
+                                    <input type="time"
+                                           name="appointmentTime"
+                                           id="appointmentTimeId"
+                                           placeholder="Appointment Time"
+                                           class="form-control" [(ngModel)]="appointment.appointmentTime" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-file-text fa-lg me-1 fa-fw"></i>
+                                <div class="flex-fill mb-0">
+                                    <textarea name="naration"
+                                              id="narationId"
+                                              placeholder="Enter Naration"
+                                              rows="3"
+                                              class="form-control" [(ngModel)]="appointment.naration"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                        <button type="button" (click)="bookAppointment()" class="btn btn-primary btn-lg">Book Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

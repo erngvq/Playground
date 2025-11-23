@@ -1,0 +1,35 @@
+<div class="col-12">
+    <div class="row">
+        <div class="col-12 d-flex align-items-center justify-content-between mb-3">
+            <h1 class="mb-0">Employee List</h1>
+            <button class="btn btn-warning" (click)="addNew()">Add New</button>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Designation</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let emp of employeeList">
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.name }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.phone_number }}</td>
+                <td>{{ emp.designation_name }}</td>
+                <td>{{ emp.role_name }}</td>
+                <td>
+                    <button class="btn btn-success" (click)="onEdit(emp.id)"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-danger ml-2" (click)="onDelete(emp.id)"><i class="bi bi-trash"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
