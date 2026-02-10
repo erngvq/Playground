@@ -5,7 +5,7 @@
         <option name="HTML_KEEP_BLANK_LINES" value="1" />
         <option name="HTML_ALIGN_TEXT" value="true" />
         <option name="HTML_SPACE_INSIDE_EMPTY_TAG" value="true" />
-        <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="html,tbody,tfoot" />
+        <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="html" />
     </HTMLCodeStyleSettings>
     <JSCodeStyleSettings version="0">
         <option name="REFORMAT_C_STYLE_COMMENTS" value="true" />
@@ -28,7 +28,7 @@
         <option name="ENABLED" value="false" />
     </editorconfig>
     <codeStyleSettings language="HTML">
-        <option name="RIGHT_MARGIN" value="200" />
+        <option name="RIGHT_MARGIN" value="240" />
         <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
         <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
         <option name="BLOCK_COMMENT_ADD_SPACE" value="true" />
