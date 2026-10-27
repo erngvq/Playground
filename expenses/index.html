@@ -1,0 +1,1984 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expenses</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .expenses {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top controls */
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-left, .top-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 7px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #f8f8f8;
+        }
+
+        button:hover {
+            background: #eee;
+        }
+
+        .save-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background: #357abd;
+        }
+
+        .mode-btn {
+            font-weight: bold;
+        }
+
+        .mode-btn.edit {
+            background: #fff0c2;
+        }
+
+        .mode-btn.view {
+            background: #c8f7c5;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Table layout */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+
+        th:nth-child(1), td:nth-child(1) {
+            width: 75px;
+            text-align: center;
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: auto;
+            text-align: left;
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 125px;
+            text-align: right;
+        }
+
+        th:nth-child(4), td:nth-child(4) {
+            width: 65px;
+            text-align: center;
+        }
+
+        th:nth-child(5), td:nth-child(5) {
+            width: 145px;
+            text-align: left;
+        }
+
+        th:nth-child(6), td:nth-child(6) {
+            width: 80px;
+            text-align: center;
+        }
+
+        th:nth-child(7), td:nth-child(7) {
+            width: 30px;
+            padding: 4px 2px;
+            text-align: center;
+        }
+
+        /* Table inputs */
+
+        .table-input, .table-select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 7px 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            background: white;
+        }
+
+        .date-input {
+            text-align: center;
+        }
+
+        .summary-input {
+            text-align: left;
+        }
+
+        .amount-input {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .currency-select, .payment-select {
+            text-align: center;
+        }
+
+        .expense-select {
+            text-align: left;
+        }
+
+        /* Amount and validation colors */
+
+        .amount-positive {
+            background: #e3f8e1;
+        }
+
+        .amount-negative {
+            background: #fbe1e1;
+        }
+
+        .payment-card {
+            background: none;
+        }
+
+        .payment-cash {
+            background: #e3f8e1;
+        }
+
+        .invalid {
+            border: 1px solid #d93025;
+            background-color: #fff0f0;
+        }
+
+        .unknown-expense {
+            color: #c62828;
+            background: #ffe0e0;
+            font-weight: bold;
+        }
+
+        /* Expense type display */
+
+        .expense-label {
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        /* Row controls */
+
+        .delete-btn {
+            border: none;
+            background: none;
+            color: #c62828;
+            font-size: 16px;
+            padding: 3px;
+        }
+
+        .delete-btn:hover {
+            background: #ffe0e0;
+        }
+
+        /* Sorting and filtering */
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            background: #e4e4e4;
+        }
+
+        .filter-btn {
+            margin-left: 4px;
+            padding: 2px 5px;
+            font-size: 12px;
+        }
+
+        .filter-active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .filter-panel {
+            display: none;
+            position: absolute;
+            z-index: 10;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            min-width: 160px;
+            text-align: left;
+        }
+
+        .filter-panel label {
+            display: block;
+            padding: 5px 0;
+        }
+
+        .filter-panel button {
+            margin-top: 8px;
+        }
+
+        .filter-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Total */
+
+        .total-row td {
+            border-top: 2px solid #555;
+            border-bottom: none;
+            padding-top: 12px;
+            font-weight: bold;
+        }
+
+        .total-label {
+            text-align: right;
+            padding-right: 12px;
+        }
+
+        .total-amount {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        /* Status and empty state */
+
+        .status {
+            margin-top: 12px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        /* Bottom controls */
+
+        .bottom-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .add-expense-btn {
+            background: #e3f8e1;
+            border: 1px solid #a5d6a7;
+            font-weight: bold;
+        }
+
+        .shortcut-hint {
+            color: #888;
+            font-size: 12px;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 8px;
+            }
+
+            .expenses {
+                padding: 10px;
+            }
+
+            .top-controls {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            table {
+                min-width: 760px;
+            }
+        }
+
+        /* Wider, responsive application layout */
+        body {
+            box-sizing: border-box;
+            padding: 16px;
+        }
+
+        .expenses {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            padding: 24px;
+        }
+
+        /* A dedicated scrollable table area */
+        .table-container {
+            width: 100%;
+            max-height: 80vh;
+            min-height: 500px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Keep the column headings visible while scrolling */
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: #f0f0f0;
+        }
+
+        /* Prevent long content from distorting the table */
+        th, td {
+            overflow-wrap: anywhere;
+        }
+
+        .table-input,
+        .table-select {
+            min-width: 0;
+        }
+
+        /* Filters must remain above other table content */
+        .filter-panel {
+            z-index: 20;
+        }
+
+        /* Smaller screens */
+        @media (max-width: 900px) {
+            body {
+                padding: 8px;
+            }
+
+            .expenses {
+                padding: 12px;
+            }
+
+            .table-container {
+                max-height: 65vh;
+                min-height: 250px;
+            }
+
+            .top-controls,
+            .bottom-controls {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .top-left,
+            .top-right {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Phones */
+        @media (max-width: 600px) {
+            .expenses {
+                padding: 8px;
+                border-radius: 4px;
+            }
+
+            .table-container {
+                min-height: 220px;
+                max-height: 60vh;
+            }
+
+            table {
+                min-width: 900px;
+            }
+
+            th, td {
+                padding: 6px 4px;
+            }
+
+            .table-input,
+            .table-select {
+                font-size: 13px;
+                padding: 6px 3px;
+            }
+
+            .shortcut-hint {
+                font-size: 11px;
+            }
+        }
+
+        /* Rebalance table column widths */
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 75px;
+        }
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: auto;
+        }
+
+        /* Amount */
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 115px;
+        }
+
+        /* Currency: keep the heading on one line */
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 105px;
+            white-space: nowrap;
+        }
+
+        /* Expense Type */
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 145px;
+        }
+
+        /* Payment: provide extra room */
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 100px;
+            white-space: nowrap;
+        }
+
+        /* Delete button */
+        th:nth-child(7),
+        td:nth-child(7) {
+            width: 35px;
+        }
+
+        /* Keep table headings together */
+        thead th {
+            white-space: nowrap;
+        }
+
+        /* Reduce Summary input padding slightly */
+        .summary-input {
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+
+        /* Keep the Payment filter panel inside the right edge */
+        #paymentFilterPanel {
+            left: auto;
+            right: 0;
+        }
+
+        /* Keep the Expense Type filter opening normally */
+        #expenseFilterPanel {
+            left: 0;
+            right: auto;
+        }
+
+        .total-row td.total-amount {
+            text-align: right;
+        }
+
+        /* Keep the Currency filter aligned with its header */
+        #currencyFilterPanel {
+            left: 0;
+            right: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="expenses">
+
+        <div class="top-controls">
+            <div class="top-left">
+                <button class="save-btn" id="saveBtn" onclick="saveToFile()">
+                    Save
+                </button>
+
+                <label>
+                    <button type="button"
+                            onclick="document.getElementById('fileInput').click()">
+                        📂 Load
+                    </button>
+
+                    <input type="file"
+                           id="fileInput"
+                           accept=".json"
+                           onchange="loadFromFile(event)">
+                </label>
+            </div>
+
+            <div class="top-right">
+                <button class="mode-btn edit"
+                        id="modeToggle"
+                        onclick="toggleMode()">
+                    EDIT MODE
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="sortable"
+                            onclick="sortBy('summary')">
+                            Summary
+                        </th>
+                        <th class="sortable"
+                            onclick="sortBy('amount')">
+                            Amount
+                        </th>
+                        <th>
+                            Currency
+                            <span class="filter-wrapper">
+                                <button class="filter-btn"
+                                        id="currencyFilterBtn"
+                                        type="button"
+                                        onclick="toggleFilter('currency', event)"
+                                        aria-label="Filter by currency"
+                                        title="Filter by currency">
+                                    ▼
+                                </button>
+                                <div class="filter-panel"
+                                    id="currencyFilterPanel"></div>
+                            </span>
+                        </th>
+                        <th>
+                            Expense Type
+                            <span class="filter-wrapper">
+                                <button class="filter-btn"
+                                        id="expenseFilterBtn"
+                                        onclick="toggleFilter('expense', event)">
+                                    ▼
+                                </button>
+                                <div class="filter-panel"
+                                     id="expenseFilterPanel"></div>
+                            </span>
+                        </th>
+                        <th>
+                            Payment
+                            <span class="filter-wrapper">
+                                <button class="filter-btn"
+                                        id="paymentFilterBtn"
+                                        onclick="toggleFilter('payment', event)">
+                                    ▼
+                                </button>
+                                <div class="filter-panel"
+                                     id="paymentFilterPanel"></div>
+                            </span>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody id="expensesBody"></tbody>
+
+                <tfoot id="expensesFooter"></tfoot>
+            </table>
+        </div>
+
+        <div class="bottom-controls" id="bottomControls">
+            <button type="button"
+                    class="add-expense-btn"
+                    id="addExpenseBtn"
+                    onclick="addExpense()">
+                + Add Expense
+            </button>
+
+            <span class="shortcut-hint">Ctrl + Enter</span>
+        </div>
+
+        <div class="status" id="status"></div>
+
+    </div>
+
+    
+    <script>
+        // Application constants
+
+        const currencies = ["USD", "EUR"];
+
+        const expenseTypes = [
+            {value: "Accomodation", label: "🏠 Accomodation"},
+            {value: "Flights", label: "✈️ Flights"},
+            {value: "Food", label: "🍔 Food"},
+            {value: "Gas", label: "⛽ Gas"},
+            {value: "Miscellaneous", label: "📦 Miscellaneous"},
+            {value: "Tours", label: "🗺️ Tours"},
+            {value: "Transportation", label: "🚆 Transportation"}
+        ];
+
+        const paymentTypes = ["Card", "Cash"];
+
+        // HTML elements
+
+        const expensesBody = document.getElementById("expensesBody");
+        const expensesFooter = document.getElementById("expensesFooter");
+        const modeToggle = document.getElementById("modeToggle");
+        const saveBtn = document.getElementById("saveBtn");
+        const status = document.getElementById("status");
+
+        // Application state
+
+        let expenses = [];
+        let mode = "edit";
+        let nextId = 1;
+        let nextOrder = 1;
+
+        let sortColumn = null;
+        let sortDirection = 1;
+
+        let expenseFilters = [];
+        let paymentFilters = [];
+        let currencyFilters = [];
+
+        // Create a new expense
+
+        function createExpense() {
+            return {
+                id: nextId++,
+                order: nextOrder++,
+                date: "",
+                summary: "",
+                amount: "",
+                currency: "USD",
+                expenseType: "",
+                payment: "Card"
+            };
+        }
+
+        // Check whether an expense has any user-entered data
+
+        function hasData(expense) {
+            return expense.date !== "" ||
+                   expense.summary.trim() !== "" ||
+                   expense.amount !== "" ||
+                   expense.expenseType !== "" ||
+                   expense.payment !== "Card" ||
+                   expense.currency !== "USD";
+        }
+
+        // Check whether an expense is complete
+
+        function isComplete(expense) {
+            return isValidDate(expense.date) &&
+                   expense.summary.trim() !== "" &&
+                   expense.summary.length <= 50 &&
+                   isValidAmount(expense.amount) &&
+                   currencies.includes(expense.currency) &&
+                   expenseTypes.some(type =>
+                       type.value === expense.expenseType
+                   ) &&
+                   paymentTypes.includes(expense.payment);
+        }
+
+        // Render the complete table
+
+        // Render expenses without automatically adding rows
+
+        function renderExpenses() {
+            expensesBody.innerHTML = "";
+            expensesFooter.innerHTML = "";
+
+            const visibleExpenses = getVisibleExpenses();
+
+            visibleExpenses.forEach(expense => {
+                const row = document.createElement("tr");
+
+                row.appendChild(createDateCell(expense));
+                row.appendChild(createSummaryCell(expense));
+                row.appendChild(createAmountCell(expense));
+                row.appendChild(createCurrencyCell(expense));
+                row.appendChild(createExpenseTypeCell(expense));
+                row.appendChild(createPaymentCell(expense));
+                row.appendChild(createDeleteCell(expense));
+
+                expensesBody.appendChild(row);
+            });
+
+            renderTotal(visibleExpenses);
+            updateControls();
+            updateFilterButtons();
+        }
+        
+        // Add one expense row
+
+        function addExpense() {
+            if (mode !== "edit") {
+                return;
+            }
+
+            const emptyExpense = expenses.find(expense => !hasData(expense));
+
+            if (emptyExpense) {
+                focusExpenseField(emptyExpense.id, "summary");
+                return;
+            }
+
+            const incomplete = expenses.some(expense => !isComplete(expense));
+
+            if (incomplete) {
+                alert(
+                    "Please complete the existing expense entries " +
+                    "before adding another row."
+                );
+                return;
+            }
+
+            const expense = createExpense();
+            expenses.push(expense);
+
+            renderExpenses();
+            focusExpenseField(expense.id, "date");
+        }
+
+        // Render the final empty row in EDIT mode
+
+        function renderPlaceholderRow() {
+            const expense = expenses[expenses.length - 1];
+
+            if (!expense) {
+                return;
+            }
+
+            if (expense.summary.trim() !== "") {
+                return;
+            }
+
+            const row = document.createElement("tr");
+
+            row.appendChild(createDateCell(expense));
+            row.appendChild(createSummaryCell(expense));
+            row.appendChild(createAmountCell(expense));
+            row.appendChild(createCurrencyCell(expense));
+            row.appendChild(createExpenseTypeCell(expense));
+            row.appendChild(createPaymentCell(expense));
+            row.appendChild(createDeleteCell(expense));
+
+            expensesBody.appendChild(row);
+        }
+
+        function updateModeRestrictions() {
+            const filters = document.querySelectorAll(".filter-wrapper");
+
+            filters.forEach(filter => {
+                filter.style.display = mode === "view"
+                    ? "inline-block"
+                    : "none";
+            });
+
+            const sortableHeaders = document.querySelectorAll(
+                "thead th.sortable"
+            );
+
+            sortableHeaders.forEach(header => {
+                header.style.cursor = mode === "view"
+                    ? "pointer"
+                    : "default";
+
+                header.style.userSelect = "none";
+            });
+        }
+
+        // Update the mode controls
+
+        function updateControls() {
+            modeToggle.textContent =
+                mode === "edit" ? "EDIT MODE" : "VIEW MODE";
+
+            modeToggle.className =
+                "mode-btn " + (mode === "edit" ? "edit" : "view");
+
+            saveBtn.disabled = mode !== "view";
+
+            saveBtn.style.opacity =
+                mode === "view" ? "1" : "0.5";
+
+            status.textContent =
+                mode === "edit"
+                    ? "Edit your expenses. Complete each entry before switching to VIEW mode."
+                    : expenses.length + " expense entries";
+
+            const addExpenseBtn =
+                document.getElementById("addExpenseBtn");
+
+            const bottomControls =
+                document.getElementById("bottomControls");
+
+            bottomControls.style.display =
+                mode === "edit" ? "flex" : "none";
+
+            addExpenseBtn.disabled = mode !== "edit";
+
+            updateModeRestrictions();
+        }
+
+        // Initialize the application
+
+        function initializeExpenses() {
+            expenses = [createExpense()];
+            mode = "edit";
+            renderExpenses();
+        }
+
+        // Create a table cell
+
+        function createCell() {
+            return document.createElement("td");
+        }
+
+        // Create a text input
+
+        function createTextInput(expense, field, className, maxLength) {
+            const input = document.createElement("input");
+
+            input.type = "text";
+            input.className = "table-input " + className;
+            input.value = expense[field];
+
+            if (maxLength) {
+                input.maxLength = maxLength;
+            }
+
+            input.disabled = mode !== "edit";
+
+            input.addEventListener("input", () => {
+                expense[field] = input.value;
+
+                if (field !== "summary") {
+                    updateInputStyle(input, expense, field);
+                }
+
+                updateControls();
+            });
+
+            input.dataset.expenseId = expense.id;
+            input.dataset.field = field;
+
+            return input;
+        }
+
+        // Create the Date cell
+
+       function createDateCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                cell.textContent = expense.date;
+                return cell;
+            }
+
+            const input = createTextInput(
+                expense,
+                "date",
+                "date-input",
+                5
+            );
+
+            input.placeholder = "MM/DD";
+            input.autocomplete = "off";
+            input.maxLength = 5;
+            input.inputMode = "numeric";
+
+            input.addEventListener("input", () => {
+                // Keep only digits and limit to four.
+                const digits = input.value.replace(/\D/g, "").slice(0, 4);
+
+                // Insert the slash automatically after the month.
+                const formatted = digits.length > 2
+                    ? digits.slice(0, 2) + "/" + digits.slice(2)
+                    : digits;
+
+                input.value = formatted;
+                expense.date = formatted;
+
+                updateInputStyle(input, expense, "date");
+                updateControls();
+            });
+
+            input.addEventListener("blur", () => {
+                if (input.value.trim() !== "") {
+                    input.value = normalizeDate(input.value);
+                    expense.date = input.value;
+                }
+
+                updateInputStyle(input, expense, "date");
+            });
+
+            cell.appendChild(input);
+
+            return cell;
+        }
+
+        // Create the Summary cell
+
+        function createSummaryCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                cell.textContent = expense.summary;
+                return cell;
+            }
+
+            const input = createTextInput(
+                expense,
+                "summary",
+                "summary-input",
+                50
+            );
+
+            input.placeholder = "Summary";
+
+            cell.appendChild(input);
+
+            return cell;
+        }
+
+        // Create the Amount cell
+
+        function createAmountCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                cell.textContent = formatAmount(expense.amount);
+
+                if (Number(expense.amount) < 0) {
+                    cell.classList.add("amount-negative");
+                } else {
+                    cell.classList.add("amount-positive");
+                }
+
+                return cell;
+            }
+
+            const input = createTextInput(
+                expense,
+                "amount",
+                "amount-input",
+                12
+            );
+
+            input.placeholder = "0.00";
+            input.inputMode = "decimal";
+
+            updateInputStyle(input, expense, "amount");
+
+            input.addEventListener("blur", () => {
+                if (isValidAmount(input.value)) {
+                    expense.amount = Number(input.value).toFixed(2);
+                    input.value = expense.amount;
+                }
+
+                updateInputStyle(input, expense, "amount");
+            });
+
+            cell.appendChild(input);
+
+            return cell;
+        }
+
+        // Create a dropdown
+
+        function createSelect(expense, field, options, className) {
+            const select = document.createElement("select");
+
+            select.className = "table-select " + className;
+            select.disabled = mode !== "edit";
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "-- Select --";
+            select.appendChild(placeholder);
+
+            options.forEach(option => {
+                const item = document.createElement("option");
+
+                if (typeof option === "string") {
+                    item.value = option;
+                    item.textContent = option;
+                } else {
+                    item.value = option.value;
+                    item.textContent = option.label;
+                }
+
+                select.appendChild(item);
+            });
+
+            select.value = expense[field];
+
+            select.addEventListener("change", () => {
+                // Update the existing expense; do not create a new one.
+                expense[field] = select.value;
+
+                // Update the existing controls without rebuilding the table.
+                updateControls();
+            });
+
+            select.dataset.expenseId = expense.id;
+            select.dataset.field = field;
+
+            return select;
+        }
+
+        // Create the Currency cell
+
+        function createCurrencyCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                cell.textContent = expense.currency;
+                return cell;
+            }
+
+            cell.appendChild(
+                createSelect(
+                    expense,
+                    "currency",
+                    currencies,
+                    "currency-select"
+                )
+            );
+
+            return cell;
+        }
+
+        // Create the Expense Type cell
+
+        function createExpenseTypeCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                const type = expenseTypes.find(
+                    item => item.value === expense.expenseType
+                );
+
+                if (type) {
+                    cell.textContent = type.label;
+                    cell.className = "expense-label";
+                } else {
+                    cell.textContent = "❓ Unknown";
+                    cell.classList.add("unknown-expense");
+                }
+
+                return cell;
+            }
+
+            const select = createSelect(
+                expense,
+                "expenseType",
+                expenseTypes,
+                "expense-select"
+            );
+
+            if (expense.expenseType &&
+                !expenseTypes.some(type =>
+                    type.value === expense.expenseType
+                )) {
+                const unknown = document.createElement("option");
+
+                unknown.value = expense.expenseType;
+                unknown.textContent = "❓ Unknown: " + expense.expenseType;
+                select.appendChild(unknown);
+                select.value = expense.expenseType;
+                select.classList.add("unknown-expense");
+            }
+
+            cell.appendChild(select);
+
+            return cell;
+        }
+
+        // Create the Payment cell
+
+        function createPaymentCell(expense) {
+            const cell = createCell();
+
+            if (mode === "view") {
+                cell.textContent = expense.payment;
+                updatePaymentStyle(cell, expense.payment);
+                return cell;
+            }
+
+            const select = createSelect(
+                expense,
+                "payment",
+                paymentTypes,
+                "payment-select"
+            );
+
+            updatePaymentStyle(select, select.value);
+
+            select.addEventListener("change", () => {
+                expense.payment = select.value;
+                updatePaymentStyle(select, select.value);
+            });
+
+            cell.appendChild(select);
+
+            return cell;
+        }
+
+        function updatePaymentStyle(element, payment) {
+            element.classList.remove(
+                "payment-card",
+                "payment-cash"
+            );
+
+            if (payment === "Card") {
+                element.classList.add("payment-card");
+            } else if (payment === "Cash") {
+                element.classList.add("payment-cash");
+            }
+        }
+
+        // Create the Delete cell
+
+        function createDeleteCell(expense) {
+            const cell = createCell();
+
+            if (mode !== "edit") {
+                return cell;
+            }
+
+            const button = document.createElement("button");
+
+            button.className = "delete-btn";
+            button.textContent = "🗑";
+            button.title = "Delete expense";
+
+            button.addEventListener("click", () => {
+                if (expenses.length === 1) {
+                    expenses[0] = createExpense();
+                } else {
+                    expenses = expenses.filter(
+                        item => item.id !== expense.id
+                    );
+                }
+
+                renderExpenses();
+            });
+
+            cell.appendChild(button);
+
+            return cell;
+        }
+
+        // Validate and highlight input fields
+
+        function updateInputStyle(input, expense, field) {
+            input.classList.remove(
+                "invalid",
+                "amount-positive",
+                "amount-negative"
+            );
+
+            if (field === "date" &&
+                input.value.trim() !== "" &&
+                !isValidDate(input.value)) {
+                input.classList.add("invalid");
+            }
+
+            if (field === "amount") {
+                if (input.value.trim() !== "" &&
+                    !isValidAmount(input.value)) {
+                    input.classList.add("invalid");
+                } else if (input.value.trim() !== "") {
+                    if (Number(input.value) < 0) {
+                        input.classList.add("amount-negative");
+                    } else {
+                        input.classList.add("amount-positive");
+                    }
+                }
+            }
+        }
+
+        // Normalize dates such as 1/5 to 01/05
+
+        function normalizeDate(value) {
+            const match = value.trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+
+            if (!match) {
+                return value.trim();
+            }
+
+            return match[1].padStart(2, "0") + "/" +
+                   match[2].padStart(2, "0");
+        }
+
+        // Format amounts with two decimal places
+
+        function formatAmount(value) {
+            return Number(value).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+                useGrouping: false
+            });
+        }
+
+        // Restore focus after a row re-render
+
+        function focusExpenseField(id, field) {
+            const input = expensesBody.querySelector(
+                '[data-expense-id="' + id + '"]' +
+                '[data-field="' + field + '"]'
+            );
+
+            if (input) {
+                input.focus();
+
+                if (input.tagName === "INPUT") {
+                    input.setSelectionRange(
+                        input.value.length,
+                        input.value.length
+                    );
+                }
+            }
+        }
+
+        // Validate dates in MM/DD format
+
+        function isValidDate(value) {
+            if (typeof value !== "string") {
+                return false;
+            }
+
+            const match = value.trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+
+            if (!match) {
+                return false;
+            }
+
+            const month = Number(match[1]);
+            const day = Number(match[2]);
+
+            if (month < 1 || month > 12 || day < 1 || day > 31) {
+                return false;
+            }
+
+            const daysInMonth = [
+                31,
+                29,
+                31,
+                30,
+                31,
+                30,
+                31,
+                31,
+                30,
+                31,
+                30,
+                31
+            ];
+
+            return day <= daysInMonth[month - 1];
+        }
+
+        // Validate numeric amounts
+
+        function isValidAmount(value) {
+            if (value === "" || value === null || value === undefined) {
+                return false;
+            }
+
+            const text = String(value).trim();
+
+            if (!/^-?\d+(\.\d{1,2})?$/.test(text)) {
+                return false;
+            }
+
+            return Number.isFinite(Number(text));
+        }
+
+        // Switch between EDIT and VIEW modes
+
+        function toggleMode() {
+            if (mode === "edit") {
+                const incomplete = expenses.filter(expense =>
+                    hasData(expense) && !isComplete(expense)
+                );
+
+                if (incomplete.length > 0) {
+                    alert(
+                        "Please complete or delete all expense entries " +
+                        "before switching to VIEW mode."
+                    );
+                    return;
+                }
+
+                expenses = expenses.filter(hasData);
+
+                mode = "view";
+
+                sortColumn = null;
+                sortDirection = 1;
+
+                renderExpenses();
+                return;
+            }
+
+            mode = "edit";
+
+            sortColumn = null;
+            sortDirection = 1;
+
+            expenseFilters = [];
+            paymentFilters = [];
+            currencyFilters = [];
+
+            expenses.sort((a, b) => a.order - b.order);
+
+            if (expenses.length === 0) {
+                expenses.push(createExpense());
+            }
+
+            renderExpenses();
+        }
+
+        // Sort expenses
+
+        function sortBy(column) {
+            if (mode !== "view") {
+                return;
+            }
+
+            if (column === "summary") {
+                sortColumn = null;
+                sortDirection = 1;
+
+                expenses.sort((a, b) => a.order - b.order);
+
+                renderExpenses();
+                return;
+            }
+
+            if (column !== "amount" &&
+                column !== "expenseType" &&
+                column !== "payment") {
+                return;
+            }
+
+            if (sortColumn === column) {
+                sortDirection *= -1;
+            } else {
+                sortColumn = column;
+                sortDirection = 1;
+            }
+
+            expenses.sort((a, b) => {
+                let first = a[column];
+                let second = b[column];
+
+                if (column === "amount") {
+                    first = Number(first);
+                    second = Number(second);
+                } else {
+                    first = String(first || "").toLowerCase();
+                    second = String(second || "").toLowerCase();
+                }
+
+                return (first < second ? -1 : first > second ? 1 : 0)
+                    * sortDirection;
+            });
+
+            renderExpenses();
+        }
+
+        // Return expenses matching the active filters
+
+        function getVisibleExpenses() {
+            return expenses.filter(expense => {
+                const matchesExpense =
+                    expenseFilters.length === 0 ||
+                    expenseFilters.includes(expense.expenseType);
+
+                const matchesPayment =
+                    paymentFilters.length === 0 ||
+                    paymentFilters.includes(expense.payment);
+
+                const matchesCurrency =
+                    currencyFilters.length === 0 ||
+                    currencyFilters.includes(expense.currency);
+
+                return matchesExpense &&
+                    matchesPayment &&
+                    matchesCurrency;
+            });
+        }
+
+        // Open or close a filter panel
+
+        function toggleFilter(type, event) {
+            if (mode !== "view") {
+                return;
+            }
+
+            event.stopPropagation();
+
+            const panelIds = {
+                expense: "expenseFilterPanel",
+                payment: "paymentFilterPanel",
+                currency: "currencyFilterPanel"
+            };
+
+            const panel = document.getElementById(panelIds[type]);
+
+            if (!panel) {
+                return;
+            }
+
+            // Close all other filter panels.
+            Object.values(panelIds).forEach(id => {
+                if (id !== panelIds[type]) {
+                    document.getElementById(id).style.display = "none";
+                }
+            });
+
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                renderFilterPanel(type);
+                panel.style.display = "block";
+            }
+        }
+
+        // Render filter checkboxes
+            
+        function renderFilterPanel(type) {
+            const filterConfig = {
+                expense: {
+                    panelId: "expenseFilterPanel",
+                    filters: expenseFilters,
+                    options: expenseTypes.map(item => ({
+                        value: item.value,
+                        label: item.label
+                    }))
+                },
+                payment: {
+                    panelId: "paymentFilterPanel",
+                    filters: paymentFilters,
+                    options: paymentTypes.map(item => ({
+                        value: item,
+                        label: item
+                    }))
+                },
+                currency: {
+                    panelId: "currencyFilterPanel",
+                    filters: currencyFilters,
+                    options: currencies.map(item => ({
+                        value: item,
+                        label: item
+                    }))
+                }
+            };
+
+            const config = filterConfig[type];
+
+            if (!config) {
+                return;
+            }
+
+            const panel = document.getElementById(config.panelId);
+            const options = config.options;
+            const selected = config.filters;
+
+            panel.innerHTML = "";
+
+            options.forEach(option => {
+                const label = document.createElement("label");
+                const checkbox = document.createElement("input");
+
+                checkbox.type = "checkbox";
+                checkbox.value = option.value;
+                checkbox.checked = selected.includes(option.value);
+
+                checkbox.addEventListener("change", () => {
+                    const current = config.filters;
+
+                    if (checkbox.checked) {
+                        if (!current.includes(option.value)) {
+                            current.push(option.value);
+                        }
+                    } else {
+                        const index = current.indexOf(option.value);
+
+                        if (index !== -1) {
+                            current.splice(index, 1);
+                        }
+                    }
+
+                    updateFilterButtons();
+                    renderExpenses();
+                });
+
+                label.appendChild(checkbox);
+                label.appendChild(
+                    document.createTextNode(" " + option.label)
+                );
+
+                panel.appendChild(label);
+            });
+
+            const clearButton = document.createElement("button");
+
+            clearButton.textContent = "Clear";
+            clearButton.type = "button";
+
+            clearButton.addEventListener("click", () => {
+                config.filters.length = 0;
+
+                renderFilterPanel(type);
+                updateFilterButtons();
+                renderExpenses();
+            });
+
+            panel.appendChild(clearButton);
+        }
+
+        // Update filter button appearance
+
+        function updateFilterButtons() {
+            document.getElementById("expenseFilterBtn")
+                .classList.toggle(
+                    "filter-active",
+                    expenseFilters.length > 0
+                );
+
+            document.getElementById("paymentFilterBtn")
+                .classList.toggle(
+                    "filter-active",
+                    paymentFilters.length > 0
+                );
+
+            document.getElementById("currencyFilterBtn")
+                .classList.toggle(
+                    "filter-active",
+                    currencyFilters.length > 0
+                );
+        }
+
+        // Close filter panels when clicking elsewhere
+
+        document.addEventListener("click", event => {
+            const panels = [
+                "expenseFilterPanel",
+                "paymentFilterPanel"
+            ];
+
+            panels.forEach(id => {
+                const panel = document.getElementById(id);
+
+                if (!panel.contains(event.target) &&
+                    !event.target.closest(".filter-wrapper")) {
+                    panel.style.display = "none";
+                }
+            });
+        });
+
+        // Render the total in VIEW mode
+
+        function renderTotal(visibleExpenses) {
+            expensesFooter.innerHTML = "";
+
+            if (mode !== "view") {
+                return;
+            }
+
+            const row = document.createElement("tr");
+            row.className = "total-row";
+
+            const labelCell = document.createElement("td");
+            labelCell.colSpan = 2;
+            labelCell.className = "total-label";
+            labelCell.textContent = "Total";
+
+            const amountCell = document.createElement("td");
+            amountCell.className = "total-amount";
+
+            const total = visibleExpenses.reduce((sum, expense) => {
+                const amount = Number(expense.amount);
+
+                return sum + (
+                    Number.isFinite(amount) ? amount : 0
+                );
+            }, 0);
+
+            amountCell.textContent = formatAmount(total);
+
+            const remainingCell = document.createElement("td");
+            remainingCell.colSpan = 4;
+
+            row.appendChild(labelCell);
+            row.appendChild(amountCell);
+            row.appendChild(remainingCell);
+
+            expensesFooter.appendChild(row);
+        }
+
+        // Prepare expense data for saving
+
+        function getExpenseData() {
+            return expenses
+                .filter(hasData)
+                .slice()
+                .sort((a, b) => a.order - b.order)
+                .map(expense => ({
+                    order: expense.order,
+                    date: expense.date,
+                    summary: expense.summary,
+                    amount: Number(expense.amount).toFixed(2),
+                    currency: expense.currency,
+                    expenseType: expense.expenseType,
+                    payment: expense.payment
+                }));
+        }
+
+        // Save Expenses.json
+
+        function saveToFile() {
+            if (mode !== "view") {
+                alert("Switch to VIEW mode before saving.");
+                return;
+            }
+
+            const text = JSON.stringify(getExpenseData(), null, 2);
+
+            const blob = new Blob(
+                [text],
+                {type: "text/markdown;charset=utf-8"}
+            );
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "Expenses.json";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(url);
+
+            status.textContent = "Expenses.json downloaded.";
+        }
+
+        // Validate loaded expense records
+
+        function validateLoadedExpense(item) {
+            if (!item || typeof item !== "object" ||
+                Array.isArray(item)) {
+                return false;
+            }
+
+            if (!isValidDate(item.date)) {
+                return false;
+            }
+
+            if (typeof item.summary !== "string" ||
+                item.summary.trim() === "" ||
+                item.summary.length > 50) {
+                return false;
+            }
+
+            if (!isValidAmount(item.amount)) {
+                return false;
+            }
+
+            if (!currencies.includes(item.currency)) {
+                return false;
+            }
+
+            if (!expenseTypes.some(type =>
+                type.value === item.expenseType
+            )) {
+                return false;
+            }
+
+            if (!paymentTypes.includes(item.payment)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Load expense data from a file
+
+        function loadFile(file) {
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                try {
+                    const text = event.target.result.trim();
+
+                    if (text === "") {
+                        expenses = [createExpense()];
+                        mode = "edit";
+
+                        sortColumn = null;
+                        sortDirection = 1;
+                        expenseFilters = [];
+                        paymentFilters = [];
+                        currencyFilters = [];
+
+                        renderExpenses();
+
+                        status.textContent =
+                            "Empty Expenses.json loaded. EDIT mode enabled.";
+
+                        return;
+                    }
+
+                    const loadedData = JSON.parse(text);
+
+                    if (!Array.isArray(loadedData)) {
+                        throw new Error(
+                            "Expected a JSON array of expenses."
+                        );
+                    }
+
+                    if (!loadedData.every(validateLoadedExpense)) {
+                        throw new Error(
+                            "One or more expense entries are invalid."
+                        );
+                    }
+
+                    expenses = loadedData.map((item, index) => ({
+                        id: index + 1,
+                        order: Number.isInteger(item.order) && item.order > 0
+                            ? item.order
+                            : index + 1,
+                        date: normalizeDate(item.date),
+                        summary: item.summary,
+                        amount: Number(item.amount).toFixed(2),
+                        currency: item.currency,
+                        expenseType: item.expenseType,
+                        payment: item.payment
+                    }));
+
+                    nextId = expenses.length + 1;
+                    nextOrder = Math.max(0, ...expenses.map(e => e.order)) + 1;
+
+                    mode = "view";
+
+                    sortColumn = null;
+                    sortDirection = 1;
+                    expenseFilters = [];
+                    paymentFilters = [];
+                    currencyFilters = [];
+
+                    renderExpenses();
+
+                    status.textContent =
+                        "Expenses.json loaded successfully.";
+                } catch (error) {
+                    alert(
+                        "Unable to load Expenses.json.\n\n" +
+                        error.message
+                    );
+                }
+            };
+
+            reader.onerror = function () {
+                alert("Unable to read the selected file.");
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Handle the file picker
+
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            if (file.name !== "Expenses.json") {
+                alert("Please select a file named Expenses.json.");
+                event.target.value = "";
+                return;
+            }
+
+            loadFile(file);
+
+            event.target.value = "";
+        }
+
+        // Support Ctrl+S on Windows and Cmd+S on Mac
+
+        document.addEventListener("keydown", event => {
+            const key = event.key.toLowerCase();
+
+            const modifier = event.ctrlKey || event.metaKey;
+
+            if (!modifier) {
+                return;
+            }
+
+            // Ctrl+Enter / Cmd+Enter: add an expense in EDIT mode.
+            if (key === "enter" && mode === "edit") {
+                event.preventDefault();
+                addExpense();
+                return;
+            }
+
+            // Ctrl+S / Cmd+S: save only in VIEW mode.
+            if (key === "s") {
+                event.preventDefault();
+
+                if (mode === "view") {
+                    saveToFile();
+                }
+            }
+        });
+
+        // Final integration fixes
+
+        // Make Expense Type and Payment headers sortable
+
+        const tableHeaders = document.querySelectorAll("thead th");
+
+        tableHeaders[4].classList.add("sortable");
+        tableHeaders[4].addEventListener("click", event => {
+            if (event.target.closest(".filter-wrapper")) {
+                return;
+            }
+
+            sortBy("expenseType");
+        });
+
+        tableHeaders[5].classList.add("sortable");
+        tableHeaders[5].addEventListener("click", event => {
+            if (event.target.closest(".filter-wrapper")) {
+                return;
+            }
+
+            sortBy("payment");
+        });
+
+        // Preserve unknown expense types when loading files
+
+        function validateLoadedExpense(item) {
+            if (!item || typeof item !== "object" ||
+                Array.isArray(item)) {
+                return false;
+            }
+
+            if (!isValidDate(item.date)) {
+                return false;
+            }
+
+            if (typeof item.summary !== "string" ||
+                item.summary.trim() === "" ||
+                item.summary.length > 50) {
+                return false;
+            }
+
+            if (!isValidAmount(item.amount)) {
+                return false;
+            }
+
+            if (!currencies.includes(item.currency)) {
+                return false;
+            }
+
+            if (typeof item.expenseType !== "string" ||
+                item.expenseType.trim() === "") {
+                return false;
+            }
+
+            if (!paymentTypes.includes(item.payment)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Keep the delete button out of normal Tab navigation
+
+        function createDeleteCell(expense) {
+            const cell = createCell();
+
+            if (mode !== "edit") {
+                return cell;
+            }
+
+            const button = document.createElement("button");
+
+            button.className = "delete-btn";
+            button.textContent = "🗑";
+            button.title = "Delete expense";
+            button.tabIndex = -1;
+
+            button.addEventListener("click", () => {
+                expenses = expenses.filter(
+                    item => item.id !== expense.id
+                );
+
+                renderExpenses();
+            });
+
+            cell.appendChild(button);
+
+            return cell;
+        }
+
+        // Initialize the finished application
+
+        initializeExpenses();
+    </script>
+
+</body>
+</html>
