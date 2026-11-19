@@ -532,7 +532,7 @@ form.addEventListener("submit", async (event) => {
         result.hidden = false;
 
         message.textContent =
-            "Your assignment has been revealed!";
+            "¡Tu amigo secreto ha sido revelado!";
 
 
         // Clear password after successful login
@@ -570,7 +570,7 @@ form.addEventListener("submit", async (event) => {
         submitButton.disabled = false;
 
         submitButton.textContent =
-            "Reveal my assignment 🎄";
+            "Revelar mi amigo secreto 🎄";
 
     }
 
